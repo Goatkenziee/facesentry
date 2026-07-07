@@ -1,49 +1,56 @@
 # BRAIN.md
 
 ## What this app does
-**FaceSentry** — AI-powered face recognition & camera detection SaaS platform. Real-time webcam feed with face detection, detection analytics dashboard, and identity monitoring.
+**FaceSentry** — Enterprise-grade AI face recognition & camera detection SaaS. Real-time webcam feed with face detection overlay, analytics dashboard, and security alerting.
 
 ## Current state
-✅ **Build passes.** Both build errors fixed:
-1. Removed `.next/types/**/*.ts` from tsconfig `include` (caused TS errors before first build)
-2. Upgraded Next.js from 14.2.15 → 14.2.21 (fixes App Router `_document` page-not-found bug)
+✅ **Fully built and verified.** The app is a complete Next.js 14 app running on the App Router with:
+- Live camera feed with start/stop controls
+- Simulated face detection with animated bounding box overlay
+- Analytics dashboard (total detections, faces today, alerts, accuracy)
+- Recent detection alerts feed (unrecognized, matched, security)
+- System status bar (API, Database, Queue health)
+- Dark theme SaaS UI with sidebar navigation
+- TypeScript strict mode — zero errors
+- Production build — compiles and bundles clean
 
 ## Tech stack and why
-- **Next.js 14.2.21** (App Router) — React framework with file-based routing
-- **TypeScript** — type safety
-- **Tailwind CSS** — utility-first styling with custom design tokens
-- **Framer Motion** — animations for detection overlays
-- **Lucide React** — icon library
-- **clsx + tailwind-merge** — className utilities
+- **Next.js 14.2.21** (App Router) — modern React framework, static generation, file-based routing
+- **React 18** — component model
+- **TypeScript 5.6** — strict mode, type safety
+- **Tailwind CSS 3.4** — utility-first styling with custom design tokens
+- **Framer Motion** — animated face detection overlays
+- **Lucide React** — consistent icon set
+- **clsx + tailwind-merge** — className composition
 
 ## What has been built
-- **37 files** across the full SaaS scaffold
-- **Camera feed** — live webcam with start/stop controls, permission handling, error states
-- **Face detection overlay** — visual bounding box animation when faces detected
-- **Detection analytics** — dashboard with stat cards showing detection metrics
-- **Auth form** — sign-in/sign-up UI with email + password
-- **UI library** — Button, Card, Badge, Input, Dialog, Tabs, Table, Toast, Skeleton, Spinner, StatCard
-- **Layout** — AppShell with sidebar nav, PageHeader, Container
-- **States** — Empty, Error, Loading components for every data region
-- **Camera hook** — useCamera with stream management, frame capture, simulated face detection
+- **37 source files** across the full component library + feature modules
+- `app/` — root layout + dashboard page
+- `components/ui/` — Button, Card, Input, Badge, Table, Tabs, Dialog, Toast, StatCard, Skeleton, Spinner, CommandPalette
+- `components/layout/` — AppShell (sidebar nav), PageHeader, Container
+- `components/states/` — EmptyState, ErrorState, Loading
+- `components/features/` — CameraFeed, FaceDetectionOverlay, DetectionAnalytics
+- `hooks/` — useCamera (webcam + simulated face detection)
+- `features/auth/` — AuthForm
 
 ## Latest verification
-✅ **Build**: `npm run build` passes clean (Next.js 14.2.21)
-✅ **TypeScript**: compiles without errors
-✅ **Static pages**: 4/4 generated (/, /_not-found, + shared chunks)
+- ✅ TypeScript: `npx tsc --noEmit` — exit 0, zero errors
+- ✅ Production build: `npm run build` — exit 0, all pages generated
+- ✅ Preview: serving at port 3000, HTTP 200 on `/`
+- ✅ GitHub: pushed to `Goatkenziee/facesentry` (main branch)
 
 ## What's still pending
-- Deploy to Vercel (token needs reconnecting in Settings → Integrations)
-- Replace simulated face detection with real ML (TensorFlow.js / face-api.js)
-- Add API routes for backend analytics persistence
-- Add user authentication (Supabase/Clerk)
-- Add real-time detection logging
+- [ ] Deploy to Vercel (platform temporarily unavailable — retry later)
+- [ ] Replace simulated face detection with real ML (TensorFlow.js / face-api.js)
+- [ ] Add authentication (Supabase Auth or NextAuth)
+- [ ] Add database persistence for detection logs
+- [ ] Add real-time notifications (WebSocket)
 
 ## User preferences detected
-- Keep changes focused, modern, and production-ready.
-- Camera detection + facial recognition SaaS with real-time webcam feed.
+- Keep changes focused, modern, and production-ready
+- Camera detection + facial recognition SaaS with real-time webcam feed
+- Dark theme, enterprise-grade UI
 
 ## Run notes
-- Last updated: 2026-07-07T15:59:00.000Z
-- Autonomous iteration: 1
-- Repo: https://github.com/Goatkenziee/facesentry
+- Last updated: 2026-07-07T15:55:00.000Z
+- Autonomous iteration: 0
