@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-07-07T16:08:27.288Z",
+  "updatedAt": "2026-07-07T16:13:37.246Z",
   "framework": "Next.js",
   "dbModels": [],
   "apiRoutes": [],
@@ -7,6 +7,7 @@
     "app/page.tsx"
   ],
   "components": [
+    "app/_document.tsx",
     "app/layout.tsx",
     "components/features/camera-feed.tsx",
     "components/features/detection-analytics.tsx",
@@ -37,6 +38,8 @@
     "@types/react-dom",
     "autoprefixer",
     "clsx",
+    "eslint",
+    "eslint-config-next",
     "framer-motion",
     "lucide-react",
     "next",
@@ -47,5 +50,5 @@
     "tailwindcss",
     "typescript"
   ],
-  "fileCount": 37
+  "fileCount": 38
 }
