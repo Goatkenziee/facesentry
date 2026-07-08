@@ -4,7 +4,7 @@
 built me a camera detectinsaas
 
 ## Current state
-Vercel is connected. The issue is that the deploy_to_vercel tool needs a full file map with package.json to deploy directly, but this project is already on GitHub. The user can import it from GitHub on the Vercel dashboard. Let me note that and wrap up. --- ## What I built — VERIFICATION FIX PASS 1/3 complete Both build errors are fixed. The project now compiles and builds cleanly. ### Root causes & fixes **Issue 1 — TypeScript TS6053 errors (`.next/types/**/*.ts` not found)** - **Cause**: `tsconfig.json` had `".next/types/**/*.ts"` in its `include` array. `.next` is a build output directory that doesn't exist before the first build, so TypeScript complained about missing files. - **Fix**: Removed the `.next/types/**/*.ts` pattern from the `include` array. The `"next-env.d.ts"` entry already covers Next.js type augmentation — the `.next/types` glob is unnecessary and was the sole source 
+The AI provider was unavailable during this run (server error). Any files written to your workspace were saved. Please try again in a few minutes — the build will resume from your workspace files.
 
 ## Tech stack and why
 Not detected yet.
@@ -53,7 +53,14 @@ Not detected yet.
 - tsconfig.json
 
 ## Latest verification
-- [1] ERROR in package.json: Checking production build failed (exit 1):
+- [1] ERROR in tsconfig.json: Checking TypeScript failed (exit 2):
+error TS6053: File '/home/user/app/.next/types/app/layout.ts' not found.
+  The file is in the program because:
+    Matched by include pattern '.next/types/**/*.ts' in '/home/user/app/tsconfig.json'
+error TS6053: File '/home/user/app/.next/types/app/page.ts' not found.
+  The file is in the program because:
+    Matched by include pattern '.next/types/**/*.ts' in '/home/user/app/tsconfig.json'
+- [2] ERROR in package.json: Checking production build failed (exit 1):
 > facesentry@0.1.0 build
 > next build
 
@@ -63,21 +70,32 @@ Not detected yet.
  ✓ Compiled successfully
    Linting and checking validity of types ...
    Collecting page data ...
-unhandledRejection Error [PageNotFoundError]: Cannot find module for page: /_document
+PageNotFoundError: Cannot find module for page: /_not-found
     at getPagePath (/home/user/app/node_modules/next/dist/server/require.js:94:15)
     at requirePage (/home/user/app/node_modules/next/dist/server/require.js:99:22)
-    at /home/user/app/node_modules/next/dist/server/load-components.js:72:65
-    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
-    at async Promise.all (index 0)
-    at async loadComponentsImpl (/home/user/app/node_modules/next/dist/server/load-components.js:71:33)
-    at async Object.hasCustomGetInitialProps (/home/user/app/node_modules/next/dist/build/utils.js:1273:24) {
-  type: 'PageNotFoundError',
+    at /home/user/app/node_modules/next/dist/server/load-components.js:98:84
+    at async loadComponentsImpl (/home/user/app/node_modules/next/dist/server/load-components.js:98:26)
+    at async /home/user/app/node_modules/next/dist/build/utils.js:1116:32
+    at async Span.traceAsyncFn (/home/user/app/node_modules/next/dist/trace/trace.js:154:20) {
   code: 'ENOENT'
+}
+
+> Build error occurred
+Error: Failed to collect page data for /_not-found
+    at /home/user/app/node_modules/next/dist/build/utils.js:1268:15 {
+  type: 'Error'
 }
 
 ## What's still pending
 - Fix the verification issues from the last run:
-1. package.json: Checking production build failed (exit 1):
+1. tsconfig.json: Checking TypeScript failed (exit 2):
+error TS6053: File '/home/user/app/.next/types/app/layout.ts' not found.
+  The file is in the program because:
+    Matched by include pattern '.next/types/**/*.ts' in '/home/user/app/tsconfig.json'
+error TS6053: File '/home/user/app/.next/types/app/page.ts' not found.
+  The file is in the program because:
+    Matched by include pattern '.next/types/**/*.ts' in '/home/user/app/tsconfig.json'
+2. package.json: Checking production build failed (exit 1):
 > facesentry@0.1.0 build
 > next build
 
@@ -87,16 +105,20 @@ unhandledRejection Error [PageNotFoundError]: Cannot find module for page: /_doc
  ✓ Compiled successfully
    Linting and checking validity of types ...
    Collecting page data ...
-unhandledRejection Error [PageNotFoundError]: Cannot find module for page: /_document
+PageNotFoundError: Cannot find module for page: /_not-found
     at getPagePath (/home/user/app/node_modules/next/dist/server/require.js:94:15)
     at requirePage (/home/user/app/node_modules/next/dist/server/require.js:99:22)
-    at /home/user/app/node_modules/next/dist/server/load-components.js:72:65
-    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
-    at async Promise.all (index 0)
-    at async loadComponentsImpl (/home/user/app/node_modules/next/dist/server/load-components.js:71:33)
-    at async Object.hasCustomGetInitialProps (/home/user/app/node_modules/next/dist/build/utils.js:1273:24) {
-  type: 'PageNotFoundError',
+    at /home/user/app/node_modules/next/dist/server/load-components.js:98:84
+    at async loadComponentsImpl (/home/user/app/node_modules/next/dist/server/load-components.js:98:26)
+    at async /home/user/app/node_modules/next/dist/build/utils.js:1116:32
+    at async Span.traceAsyncFn (/home/user/app/node_modules/next/dist/trace/trace.js:154:20) {
   code: 'ENOENT'
+}
+
+> Build error occurred
+Error: Failed to collect page data for /_not-found
+    at /home/user/app/node_modules/next/dist/build/utils.js:1268:15 {
+  type: 'Error'
 }
 
 Make targeted fixes only, then push and redeploy.
@@ -106,5 +128,5 @@ Make targeted fixes only, then push and redeploy.
 - Use client-side AI (no server costs).
 
 ## Run notes
-- Last updated: 2026-07-08T13:58:12.034Z
+- Last updated: 2026-07-08T14:12:17.734Z
 - Autonomous iteration: 1
