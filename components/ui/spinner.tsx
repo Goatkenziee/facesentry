@@ -1,6 +1,23 @@
-import { Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+"use client";
 
-export function Spinner({ className }: { className?: string }) {
-  return <Loader2 className={cn("h-4 w-4 animate-spin text-muted-foreground", className)} />;
+import { cn } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
+
+interface SpinnerProps {
+  className?: string;
+  size?: "sm" | "default" | "lg";
+}
+
+export function Spinner({ className, size = "default" }: SpinnerProps) {
+  return (
+    <Loader2
+      className={cn(
+        "animate-spin text-muted-foreground",
+        size === "sm" && "h-4 w-4",
+        size === "default" && "h-6 w-6",
+        size === "lg" && "h-8 w-8",
+        className
+      )}
+    />
+  );
 }

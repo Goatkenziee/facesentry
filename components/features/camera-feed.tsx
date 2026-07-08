@@ -1,10 +1,9 @@
 "use client";
 
-import { Camera, CameraOff, RefreshCw } from "lucide-react";
+import { Camera, CameraOff, RefreshCw, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Spinner } from "@/components/ui/spinner";
 import type { CameraState } from "@/hooks/use-camera";
 import { FaceDetectionOverlay } from "./face-detection-overlay";
 
@@ -18,7 +17,7 @@ interface CameraFeedProps {
 }
 
 export function CameraFeed({ videoRef, canvasRef, cameraState, onStart, onStop }: CameraFeedProps) {
-  const { isActive, error, faceDetected, faceCount } = cameraState;
+  const { isActive, error, faceDetected, faceCount, faces, modelLoading, modelLoaded } = cameraState;
 
   return (
     <Card className="overflow-hidden border-border/50">
@@ -31,8 +30,14 @@ export function CameraFeed({ videoRef, canvasRef, cameraState, onStart, onStop }
               LIVE
             </Badge>
           )}
-          {!isActive && !error && (
+          {!isActive && !error && !modelLoading && (
             <Badge tone="outline">Offline</Badge>
+          )}
+          {modelLoading && (
+            <Badge tone="warning" className="gap-1.5">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              Loading model…
+            </Badge>
           )}
         </div>
         <div className="flex items-center gap-2">
@@ -60,6 +65,16 @@ export function CameraFeed({ videoRef, canvasRef, cameraState, onStart, onStop }
                 Retry
               </Button>
             </div>
+          ) : modelLoading ? (
+            <div className="flex flex-col items-center gap-3 p-8 text-center">
+              <Loader2 className="h-10 w-10 animate-spin text-muted-foreground/40" />
+              <p className="text-sm text-muted-foreground">
+                Loading AI face detection model…
+              </p>
+              <p className="text-xs text-muted-foreground/60">
+                This happens once — the model runs entirely in your browser
+              </p>
+            </div>
           ) : isActive ? (
             <>
               <video
@@ -72,6 +87,9 @@ export function CameraFeed({ videoRef, canvasRef, cameraState, onStart, onStop }
               <FaceDetectionOverlay
                 isDetecting={faceDetected}
                 faceCount={faceCount}
+                faces={faces}
+                videoWidth={640}
+                videoHeight={480}
               />
               {/* Hidden canvas for frame capture */}
               <canvas ref={canvasRef} className="hidden" />
@@ -96,6 +114,10 @@ export function CameraFeed({ videoRef, canvasRef, cameraState, onStart, onStop }
             <div className="flex items-center gap-1.5">
               <span className={`h-1.5 w-1.5 rounded-full ${faceDetected ? "bg-success" : "bg-muted-foreground/30"}`} />
               {faceDetected ? `${faceCount} face(s) detected` : "No face detected"}
+            </div>
+            <div className="flex items-center gap-1.5">
+              <span className={`h-1.5 w-1.5 rounded-full ${modelLoaded ? "bg-success" : "bg-muted-foreground/30"}`} />
+              AI model {modelLoaded ? "ready" : "loading"}
             </div>
             <div className="ml-auto">640 × 480</div>
           </div>

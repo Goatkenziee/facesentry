@@ -1,15 +1,24 @@
+"use client";
+
 import { AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export function ErrorState({ title = "Something went wrong", description, onRetry }: {
-  title?: string; description?: string; onRetry?: () => void;
-}) {
+interface ErrorStateProps {
+  message?: string;
+  onRetry?: () => void;
+}
+
+export function ErrorState({ message = "Something went wrong", onRetry }: ErrorStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-lg border border-destructive/30 bg-destructive/5 py-16 text-center">
-      <AlertTriangle className="mb-3 h-8 w-8 text-destructive" />
-      <h3 className="text-sm font-semibold">{title}</h3>
-      {description && <p className="mt-1 max-w-sm text-sm text-muted-foreground">{description}</p>}
-      {onRetry && <Button variant="outline" size="sm" className="mt-4" onClick={onRetry}>Try again</Button>}
+    <div className="flex flex-col items-center justify-center rounded-xl border border-destructive/20 bg-destructive/5 p-12 text-center">
+      <AlertTriangle className="mb-4 h-10 w-10 text-destructive/60" />
+      <h3 className="mb-1 text-sm font-medium">Error</h3>
+      <p className="mb-4 text-sm text-muted-foreground max-w-sm">{message}</p>
+      {onRetry && (
+        <Button variant="outline" size="sm" onClick={onRetry}>
+          Try Again
+        </Button>
+      )}
     </div>
   );
 }
