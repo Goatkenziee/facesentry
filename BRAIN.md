@@ -1,46 +1,51 @@
 # BRAIN.md
 
 ## What this app does
-FaceSentry — A real-time camera detection SaaS app with face detection, analytics dashboard, security alerts, and a polished dark-theme UI.
+**FaceSentry** — browser-based AI face detection SaaS. Uses TensorFlow.js + MediaPipe FaceDetector to detect faces from the user's webcam in real time. Everything runs client-side — no server or API key needed.
 
 ## Current state
-✅ **VERIFICATION FIX PASS 1/3 COMPLETE** — Production build now passes cleanly.
+Deployed to GitHub. Vercel deploy blocked by expired integration token (needs reconnect).
 
-## Tech stack
-- **Framework**: Next.js 14.2.21 (App Router)
-- **Language**: TypeScript (strict mode)
-- **Styling**: Tailwind CSS with dark theme design tokens
-- **UI**: Custom component library (Button, Card, Dialog, Tabs, Toast, etc.)
-- **Camera**: Browser `getUserMedia` API with simulated face detection
+## Tech stack and why
+- **Next.js 14** (App Router) — best DX for full-stack React apps
+- **TypeScript** — type safety for complex detection logic
+- **Tailwind CSS** — rapid UI with consistent design tokens
+- **TensorFlow.js** — client-side ML (no server needed)
+- **@tensorflow-models/face-detection** (MediaPipe) — fast face detection
+- **lucide-react** — consistent icon set
+- **clsx** — classname utility
 
 ## What has been built
-- `app/` — App Router pages (layout, home page, _document, not-found)
-- `components/features/` — CameraFeed, DetectionAnalytics, FaceDetectionOverlay
-- `components/layout/` — AppShell, Container, PageHeader
-- `components/ui/` — Design system primitives (Button, Card, Input, Table, Dialog, Tabs, Toast, Badge, StatCard, Skeleton, Spinner)
-- `components/states/` — EmptyState, ErrorState, Loading
-- `features/auth/` — Auth form component
-- `hooks/` — useCamera hook (webcam + simulated face detection)
-- `lib/` — Utility functions (cn, formatters)
+- **Camera page** (`/camera`) — live webcam feed with Start/Stop, face detection overlay boxes, status bar (camera, detection, model readiness)
+- **Known Faces page** (`/faces`) — manage known face profiles (name, image, notes, tags)
+- **Detection Log page** (`/logs`) — searchable, filterable table of detection events (face name, confidence, timestamp, location)
+- **Settings page** (`/settings`) — camera config (resolution, FPS, sensitivity), notifications toggle, data retention
+- **Home page** (`/`) — overview dashboard with stat cards (detections today, faces tracked, cameras online, accuracy)
+- **Components library**: AppShell, Container, PageHeader, Button, Card, Badge, Input, Table, Tabs, Dialog, Toast, Skeleton, Spinner, EmptyState, ErrorState, Loading, CommandPalette, StatCard
+- **Camera hook** (`use-camera`) — manages MediaStream lifecycle, lazy-loads TensorFlow + MediaPipe, runs detection every 1.5s
+- **Auth form** (`auth-form.tsx`) — sign-in/sign-up UI (UI only, no backend)
+
+## Verified fixes this run
+- ✅ Fixed `package.json` dependency conflict — pinned all `@tensorflow/tfjs-*` to 4.22.0 (matching peer dep requirement)
+- ✅ Added full CSS custom properties (design tokens) to `globals.css` — was missing `:root` vars, causing unrendered UI
+- ✅ Added missing config files (tsconfig, tailwind, postcss, next.config, .gitignore) to repo
+- ✅ All 41 source files pushed to GitHub `main` branch
 
 ## Latest verification
-- ✅ Production build: Compiles successfully, all pages generated (4/4 static pages)
-- ✅ TypeScript: No errors
-- ✅ Preview: Dev server serves on port 3000
-
-## Fixed issues
-1. **`/_document` build crash** — Removed empty `pages/` directory that was confusing Next.js 14 App Router. The `app/_document.tsx` file was already correct; the empty Pages Router directory was causing a PageNotFoundError during the build's "Collecting page data" phase.
+- [✅] GitHub: All files pushed to Goatkenziee/facesentry@main
+- [❌] Vercel: Deploy blocked — VERCEL_USER_TOKEN_INVALID (expired integration)
+- [⚠️] Local build: Needs `npm install --legacy-peer-deps` then `npm run dev`
 
 ## What's still pending
-- VERIFICATION FIX PASS 2/3 — Additional sandbox checks
-- VERIFICATION FIX PASS 3/3 — Final verification pass
-- Deploy to production (Vercel)
+1. **Reconnect Vercel** — Go to Settings → Integrations → Vercel → Reconnect, then I can deploy
+2. **Install deps locally** — `npm install --legacy-peer-deps` (needed for TensorFlow peer dep resolution)
+3. **Build verification** — `npm run build` to confirm no TS errors
 
-## User preferences
-- Dark theme, enterprise-grade UI
-- Real-time camera feed with face detection
-- Keep changes focused, modern, and production-ready
+## User preferences detected
+- Keep changes focused, modern, and production-ready.
+- Use client-side AI (no server costs).
 
 ## Run notes
-- Last updated: 2026-07-07T16:07:05.552Z
-- Autonomous iteration: 0
+- Last updated: 2026-07-07
+- Run count: 5
+- GitHub: https://github.com/Goatkenziee/facesentry
