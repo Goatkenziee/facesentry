@@ -8,6 +8,43 @@ export interface CameraState {
   error: string | null;
   faceDetected: boolean;
   faceCount: number;
+  faces: FaceBox[];
+  modelLoading: boolean;
+  modelLoaded: boolean;
+}
+
+export interface FaceBox {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  confidence: number;
+}
+
+// Lazy-load TensorFlow + face-detection model so the page loads fast
+let tfPromise: Promise<typeof import("@tensorflow/tfjs-core")> | null = null;
+let fdPromise: Promise<typeof import("@tensorflow-models/face-detection")> | null = null;
+let detectorInstance: any = null;
+
+async function ensureDetector() {
+  if (detectorInstance) return detectorInstance;
+  if (!tfPromise) {
+    tfPromise = import("@tensorflow/tfjs-core").then(async (tf) => {
+      await import("@tensorflow/tfjs-backend-webgl");
+      await tf.ready();
+      return tf;
+    });
+  }
+  if (!fdPromise) {
+    fdPromise = import("@tensorflow-models/face-detection");
+  }
+  const tf = await tfPromise;
+  const fd = await fdPromise;
+  detectorInstance = await fd.createDetector(fd.SupportedModels.MediaPipeFaceDetector, {
+    runtime: "tfjs",
+    maxFaces: 10,
+  });
+  return detectorInstance;
 }
 
 export function useCamera() {
@@ -19,12 +56,20 @@ export function useCamera() {
     error: null,
     faceDetected: false,
     faceCount: 0,
+    faces: [],
+    modelLoading: false,
+    modelLoaded: false,
   });
-  const animFrameRef = useRef<number>(0);
+  const detectionIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const startCamera = useCallback(async () => {
     try {
-      setState((s) => ({ ...s, error: null }));
+      setState((s) => ({ ...s, error: null, modelLoading: true }));
+      
+      // Load the face detection model
+      await ensureDetector();
+      setState((s) => ({ ...s, modelLoaded: true, modelLoading: false }));
+      
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: "user", width: { ideal: 640 }, height: { ideal: 480 } },
         audio: false,
@@ -32,7 +77,15 @@ export function useCamera() {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
       }
-      setState({ stream, isActive: true, error: null, faceDetected: false, faceCount: 0 });
+      setState((s) => ({
+        ...s,
+        stream,
+        isActive: true,
+        error: null,
+        faceDetected: false,
+        faceCount: 0,
+        faces: [],
+      }));
     } catch (err: unknown) {
       const msg = err instanceof DOMException
         ? err.name === "NotAllowedError"
@@ -41,18 +94,30 @@ export function useCamera() {
             ? "No camera found on this device."
             : `Camera error: ${err.message}`
         : "Failed to access camera.";
-      setState((s) => ({ ...s, error: msg, isActive: false }));
+      setState((s) => ({ ...s, error: msg, isActive: false, modelLoading: false }));
     }
   }, []);
 
   const stopCamera = useCallback(() => {
+    if (detectionIntervalRef.current) {
+      clearInterval(detectionIntervalRef.current);
+      detectionIntervalRef.current = null;
+    }
     if (state.stream) {
       state.stream.getTracks().forEach((t) => t.stop());
     }
-    cancelAnimationFrame(animFrameRef.current);
     if (videoRef.current) videoRef.current.srcObject = null;
-    setState({ stream: null, isActive: false, error: null, faceDetected: false, faceCount: 0 });
-  }, [state.stream]);
+    setState({
+      stream: null,
+      isActive: false,
+      error: null,
+      faceDetected: false,
+      faceCount: 0,
+      faces: [],
+      modelLoading: false,
+      modelLoaded: state.modelLoaded,
+    });
+  }, [state.stream, state.modelLoaded]);
 
   const captureFrame = useCallback((): string | null => {
     const video = videoRef.current;
@@ -66,24 +131,45 @@ export function useCamera() {
     return canvas.toDataURL("image/jpeg", 0.8);
   }, []);
 
-  // Simulated face detection (in production, this would call a real ML model API)
-  const simulateFaceDetection = useCallback(() => {
-    // This is a visual placeholder — real face detection would use
-    // TensorFlow.js / face-api.js or a cloud API
-    const detected = Math.random() > 0.3;
-    setState((s) => ({
-      ...s,
-      faceDetected: detected,
-      faceCount: detected ? Math.floor(Math.random() * 3) + 1 : 0,
-    }));
-  }, []);
-
-  // Run simulated detection every 2s while camera is active
+  // Run real face detection every 1.5s while camera is active
   useEffect(() => {
-    if (!state.isActive) return;
-    const interval = setInterval(simulateFaceDetection, 2000);
-    return () => clearInterval(interval);
-  }, [state.isActive, simulateFaceDetection]);
+    if (!state.isActive || !state.modelLoaded) return;
+
+    const runDetection = async () => {
+      const video = videoRef.current;
+      if (!video || video.readyState < 2) return;
+      try {
+        const detector = await ensureDetector();
+        const detections = await detector.estimateFaces(video);
+        const faces: FaceBox[] = detections.map((d: any) => ({
+          x: d.box.xMin ?? d.box.x ?? 0,
+          y: d.box.yMin ?? d.box.y ?? 0,
+          width: d.box.width ?? (d.box.xMax - d.box.xMin),
+          height: d.box.height ?? (d.box.yMax - d.box.yMin),
+          confidence: d.score ?? d.confidence ?? 0,
+        }));
+        setState((s) => ({
+          ...s,
+          faceDetected: faces.length > 0,
+          faceCount: faces.length,
+          faces,
+        }));
+      } catch {
+        // Silently retry on next interval
+      }
+    };
+
+    detectionIntervalRef.current = setInterval(runDetection, 1500);
+    // Run immediately
+    runDetection();
+
+    return () => {
+      if (detectionIntervalRef.current) {
+        clearInterval(detectionIntervalRef.current);
+        detectionIntervalRef.current = null;
+      }
+    };
+  }, [state.isActive, state.modelLoaded]);
 
   // Cleanup on unmount
   useEffect(() => {

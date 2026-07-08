@@ -2,78 +2,26 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ============================================================================
-   DESIGN TOKENS — FaceSentry: Cyber-teal security brand
-   ============================================================================ */
-:root {
-  --background: 225 20% 8%;
-  --foreground: 0 0% 96%;
-  --card: 225 15% 12%;
-  --card-foreground: 0 0% 96%;
-  --muted: 225 12% 16%;
-  --muted-foreground: 225 10% 60%;
-  --border: 225 12% 20%;
-  --input: 225 12% 20%;
-  --ring: 175 80% 45%;
-  --primary: 175 80% 40%;
-  --primary-foreground: 225 20% 8%;
-  --accent: 175 50% 20%;
-  --accent-foreground: 175 80% 60%;
-  --success: 142 71% 45%;
-  --warning: 38 92% 50%;
-  --destructive: 0 72% 51%;
-  --destructive-foreground: 0 0% 98%;
-  --radius: 0.75rem;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
 
-.dark {
-  --background: 225 20% 8%;
-  --foreground: 0 0% 96%;
-  --card: 225 15% 12%;
-  --card-foreground: 0 0% 96%;
-  --muted: 225 12% 16%;
-  --muted-foreground: 225 10% 60%;
-  --border: 225 12% 20%;
-  --input: 225 12% 20%;
-  --ring: 175 80% 45%;
-  --primary: 175 80% 40%;
-  --primary-foreground: 225 20% 8%;
-  --accent: 175 50% 20%;
-  --accent-foreground: 175 80% 60%;
-  --success: 142 61% 50%;
-  --warning: 38 92% 55%;
-  --destructive: 0 62% 50%;
-  --destructive-foreground: 0 0% 98%;
+@layer utilities {
+  .animate-pulse-scan {
+    animation: pulse-scan 2s ease-in-out infinite;
+  }
 }
 
-* { border-color: hsl(var(--border)); }
-
-body {
-  background: hsl(var(--background));
-  color: hsl(var(--foreground));
-  font-feature-settings: "rlig" 1, "calt" 1;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-/* Motion system */
-@keyframes fade-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
-@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes pulse-scan { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
-@keyframes scan-line { 0% { top: 0%; } 100% { top: 100%; } }
-.animate-fade-up { animation: fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.animate-fade-in { animation: fade-in 0.4s ease both; }
-.animate-pulse-scan { animation: pulse-scan 2s ease-in-out infinite; }
-.animate-scan-line { animation: scan-line 2s ease-in-out infinite; }
-
-/* Scan overlay for face detection */
-.scan-overlay::after {
-  content: '';
-  position: absolute;
-  left: 10%;
-  right: 10%;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, hsl(var(--primary)), transparent);
-  box-shadow: 0 0 8px hsl(var(--primary)), 0 0 20px hsl(var(--primary) / 0.5);
-  animation: scan-line 2s ease-in-out infinite;
+@keyframes pulse-scan {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
